@@ -13,4 +13,12 @@ resources:
   kind: Argonaut
   path: github.com/laetho/argonaut/api/v1
   version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: metalabs.no
+  group: argonaut
+  kind: Tunnel
+  path: github.com/laetho/argonaut/api/v1
+  version: v1
 version: "3"

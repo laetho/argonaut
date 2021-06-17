@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -28,8 +29,25 @@ type ArgonautSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of Argonaut. Edit argonaut_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Reference to a ArgoTunnel{}
+	Tunnel v1.TypedLocalObjectReference `json:"tunnel"`
+
+	// Label selector for finding pod's to tunnel traffic for
+	PodSelector metav1.LabelSelector `json:"podSelector,omitempty"`
+
+	// LabelSelector for finding corev1.Service{} to tunnel
+	ServiceSelector metav1.LabelSelector `json:"serviceSelector,omitempty"`
+
+	// List of hosts to manage for this Argonaut
+	Ingress []ArgonautHost `json:"ingress"`
+}
+
+// ArgonaoutHost defines a host
+type ArgonautHost struct {
+	// Describes the desired FQDN hostname for
+	Hostname    string `json:"hostname,omitempty"`
+	ServiceHost string `json:"service"`
+	Path        string `json:"path,omitempty"`
 }
 
 // ArgonautStatus defines the observed state of Argonaut

@@ -1,0 +1,34 @@
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - argonaut.metalabs.no
+  resources:
+  - argonauts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - argonaut.metalabs.no
+  resources:
+  - argonauts/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - argonaut.metalabs.no
+  resources:
+  - argonauts/status
+  verbs:
+  - get
+  - patch
+  - update
