@@ -1,0 +1,7 @@
+apiVersion: argonaut.metalabs.no/v1
+kind: Argonaut
+metadata:
+  name: argonaut-sample
+spec:
+  # Add fields here
+  foo: bar

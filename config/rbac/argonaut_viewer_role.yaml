@@ -1,0 +1,20 @@
+# permissions for end users to view argonauts.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argonaut-viewer-role
+rules:
+- apiGroups:
+  - argonaut.metalabs.no
+  resources:
+  - argonauts
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - argonaut.metalabs.no
+  resources:
+  - argonauts/status
+  verbs:
+  - get

@@ -1,0 +1,24 @@
+# permissions for end users to edit argonauts.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argonaut-editor-role
+rules:
+- apiGroups:
+  - argonaut.metalabs.no
+  resources:
+  - argonauts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - argonaut.metalabs.no
+  resources:
+  - argonauts/status
+  verbs:
+  - get
