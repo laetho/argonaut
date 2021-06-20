@@ -17,30 +17,31 @@ limitations under the License.
 package v1beta1
 
 import (
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // ArgonautSpec defines the desired state of Argonaut
 type ArgonautSpec struct {
 
-	// Reference to a ArgoTunnel{}
+	// Reference to a ArgoTunnel{}. If tunnel definition
 	ArgoTunnelName string `json:"argoTunnelName"`
 
-	// List of hosts to manage for this Argonaut
-	Ingress []ArgonautHostEndpoints `json:"ingress"`
+	// Reference to a secret that contains email and token for CloudFlare API access.
+	CFAuthSecret v1.SecretReference `json:"cfAuthSecret"`
+
+	// List of hosts to manage for this Argonaut instance.
+	Ingress []ArgonautEndpoints `json:"ingress"`
 }
 
-// ArgonaoutHost defines a host
-type ArgonautHostEndpoints struct {
+// ArgonaoutHost defines a
+type ArgonautEndpoints struct {
 	// Describes the desired FQDN hostname for
-	Hostname    string `json:"hostname"`
+	Hostname string `json:"hostname"`
 
 	// Path on host endpoints to expose. Supports filters/wildcards.. Doc ref.
 	// +optional
-	Path        string `json:"path,omitempty"`
+	Path string `json:"path,omitempty"`
 
 	// Label selector for finding pod's to tunnel traffic for
 	// +optional

@@ -3,7 +3,6 @@
 # It should be run by config/default
 resources:
 - bases/argonaut.metalabs.no_argonauts.yaml
-- bases/argonaut.metalabs.no_tunnels.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

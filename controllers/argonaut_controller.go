@@ -18,11 +18,14 @@ package controllers
 
 import (
 	"context"
-
+	"fmt"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"time"
 
 	argonautv1 "github.com/laetho/argonaut/api/v1beta1"
 )
@@ -49,7 +52,14 @@ type ArgonautReconciler struct {
 func (r *ArgonautReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	// your logic here
+	fmt.Println("actually in Reconcile!")
+	time.Sleep(1000000)
+
+	var argonaut argonautv1.Argonaut
+	if err := r.Get(ctx, req.NamespacedName, &argonaut); err != nil {
+		log.FromContext(ctx).Error(err, "unable to fetch Argonaut")
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
 	return ctrl.Result{}, nil
 }
@@ -58,5 +68,23 @@ func (r *ArgonautReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 func (r *ArgonautReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&argonautv1.Argonaut{}).
+		WithEventFilter(predicate.Funcs{
+			CreateFunc: func(e event.CreateEvent) bool {
+				return true
+			},
+			DeleteFunc: func(e event.DeleteEvent) bool {
+				return false
+			},
+			UpdateFunc: func(e event.UpdateEvent) bool {
+				// Supress update events on same generation of Argonaut resource.
+				oldGen := e.ObjectOld.GetGeneration()
+				newGen := e.ObjectNew.GetGeneration()
+				fmt.Println(oldGen, newGen)
+				if newGen == oldGen {
+					return false
+				}
+				return true
+			},
+		}).
 		Complete(r)
 }

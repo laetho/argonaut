@@ -1,7 +1,17 @@
 apiVersion: argonaut.metalabs.no/v1beta1
 kind: Argonaut
 metadata:
-  name: argonaut-sample
+  name: testantino
+  namespace: default
+  labels:
+    blah: "blarg"
 spec:
-  # Add fields here
-  foo: bar
+  argoTunnelName: "test"
+  cfAuthSecret:
+    name: argonaut
+    namespace: default
+  ingress:
+    - hostname: test.anti.no
+      serviceSelector:
+        matchLabels:
+          app: nginx
