@@ -1,7 +1,0 @@
-apiVersion: argonaut.metalabs.no/v1
-kind: Tunnel
-metadata:
-  name: tunnel-sample
-spec:
-  # Add fields here
-  foo: bar

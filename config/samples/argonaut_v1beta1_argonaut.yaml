@@ -1,4 +1,4 @@
-apiVersion: argonaut.metalabs.no/v1
+apiVersion: argonaut.metalabs.no/v1beta1
 kind: Argonaut
 metadata:
   name: argonaut-sample
