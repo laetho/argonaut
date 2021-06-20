@@ -5,20 +5,12 @@ projectName: argonaut
 repo: github.com/laetho/argonaut
 resources:
 - api:
-    crdVersion: v1
+    crdVersion: v1beta1
     namespaced: true
   controller: true
   domain: metalabs.no
   group: argonaut
   kind: Argonaut
-  path: github.com/laetho/argonaut/api/v1
-  version: v1
-- api:
-    crdVersion: v1
-    namespaced: true
-  domain: metalabs.no
-  group: argonaut
-  kind: Tunnel
-  path: github.com/laetho/argonaut/api/v1
-  version: v1
+  path: github.com/laetho/argonaut/api/v1beta1
+  version: v1beta1
 version: "3"

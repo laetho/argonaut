@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	argonautv1 "github.com/laetho/argonaut/api/v1"
+	argonautv1 "github.com/laetho/argonaut/api/v1beta1"
 )
 
 // ArgonautReconciler reconciles a Argonaut object

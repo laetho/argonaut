@@ -14,10 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1
+package v1beta1
 
 import (
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -26,28 +25,30 @@ import (
 
 // ArgonautSpec defines the desired state of Argonaut
 type ArgonautSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 
 	// Reference to a ArgoTunnel{}
-	Tunnel v1.TypedLocalObjectReference `json:"tunnel"`
-
-	// Label selector for finding pod's to tunnel traffic for
-	PodSelector metav1.LabelSelector `json:"podSelector,omitempty"`
-
-	// LabelSelector for finding corev1.Service{} to tunnel
-	ServiceSelector metav1.LabelSelector `json:"serviceSelector,omitempty"`
+	ArgoTunnelName string `json:"argoTunnelName"`
 
 	// List of hosts to manage for this Argonaut
-	Ingress []ArgonautHost `json:"ingress"`
+	Ingress []ArgonautHostEndpoints `json:"ingress"`
 }
 
 // ArgonaoutHost defines a host
-type ArgonautHost struct {
+type ArgonautHostEndpoints struct {
 	// Describes the desired FQDN hostname for
-	Hostname    string `json:"hostname,omitempty"`
-	ServiceHost string `json:"service"`
+	Hostname    string `json:"hostname"`
+
+	// Path on host endpoints to expose. Supports filters/wildcards.. Doc ref.
+	// +optional
 	Path        string `json:"path,omitempty"`
+
+	// Label selector for finding pod's to tunnel traffic for
+	// +optional
+	PodSelector metav1.LabelSelector `json:"podSelector,omitempty"`
+
+	// LabelSelector for finding corev1.Service{} to tunnel
+	// +optional
+	ServiceSelector metav1.LabelSelector `json:"serviceSelector,omitempty"`
 }
 
 // ArgonautStatus defines the observed state of Argonaut

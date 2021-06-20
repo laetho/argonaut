@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	argonautv1 "github.com/laetho/argonaut/api/v1"
+	argonautv1 "github.com/laetho/argonaut/api/v1beta1"
 	"github.com/laetho/argonaut/controllers"
 	//+kubebuilder:scaffold:imports
 )
