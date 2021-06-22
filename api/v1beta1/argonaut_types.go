@@ -44,12 +44,7 @@ type ArgonautEndpoints struct {
 	Path string `json:"path,omitempty"`
 
 	// Label selector for finding pod's to tunnel traffic for
-	// +optional
-	PodSelector metav1.LabelSelector `json:"podSelector,omitempty"`
-
-	// LabelSelector for finding corev1.Service{} to tunnel
-	// +optional
-	ServiceSelector metav1.LabelSelector `json:"serviceSelector,omitempty"`
+	EndpointsSelector metav1.LabelSelector `json:"endpointsSelector,omitempty"`
 }
 
 // ArgonautStatus defines the observed state of Argonaut

@@ -57,14 +57,7 @@ spec:
                 items:
                   description: ArgonaoutHost defines a
                   properties:
-                    hostname:
-                      description: Describes the desired FQDN hostname for
-                      type: string
-                    path:
-                      description: Path on host endpoints to expose. Supports filters/wildcards..
-                        Doc ref.
-                      type: string
-                    podSelector:
+                    endpointsSelector:
                       description: Label selector for finding pod's to tunnel traffic
                         for
                       properties:
@@ -109,6 +102,13 @@ spec:
                             only "value". The requirements are ANDed.
                           type: object
                       type: object
+                    hostname:
+                      description: Describes the desired FQDN hostname for
+                      type: string
+                    path:
+                      description: Path on host endpoints to expose. Supports filters/wildcards..
+                        Doc ref.
+                      type: string
                     serviceSelector:
                       description: LabelSelector for finding corev1.Service{} to tunnel
                       properties:

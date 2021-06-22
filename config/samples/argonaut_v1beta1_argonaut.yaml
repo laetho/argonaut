@@ -3,8 +3,6 @@ kind: Argonaut
 metadata:
   name: testantino
   namespace: default
-  labels:
-    blah: "blarg"
 spec:
   argoTunnelName: "test"
   cfAuthSecret:
@@ -12,6 +10,6 @@ spec:
     namespace: default
   ingress:
     - hostname: test.anti.no
-      serviceSelector:
+      endpointsSelector:
         matchLabels:
           app: nginx
