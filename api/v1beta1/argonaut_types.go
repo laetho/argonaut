@@ -27,6 +27,10 @@ type ArgonautSpec struct {
 	// Reference to a ArgoTunnel{}. If tunnel definition
 	ArgoTunnelName string `json:"argoTunnelName"`
 
+	// Secret Reference containing the tunnel secret. If not provided the Argonaut operator
+	// will create it and populate it.
+	ArgoTunnelSecret v1.SecretReference `json:"argoTunnelSecret,omitempty"`
+
 	// Reference to a secret that contains email and token for CloudFlare API access.
 	CFAuthSecret v1.SecretReference `json:"cfAuthSecret"`
 
@@ -49,8 +53,9 @@ type ArgonautEndpoints struct {
 
 // ArgonautStatus defines the observed state of Argonaut
 type ArgonautStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+
+	// Hold UUID for Argo Tunnel. Gets populated when reconciled or created.
+	TunnelId string `json:"tunnelId,omitempty"`
 }
 
 //+kubebuilder:object:root=true
