@@ -35,11 +35,11 @@ type ArgonautSpec struct {
 	CFAuthSecret v1.SecretReference `json:"cfAuthSecret"`
 
 	// List of hosts to manage for this Argonaut instance.
-	Ingress []ArgonautEndpoints `json:"ingress"`
+	Ingress []ArgonautIngressRule `json:"ingress"`
 }
 
 // ArgonaoutHost defines a
-type ArgonautEndpoints struct {
+type ArgonautIngressRule struct {
 	// Describes the desired FQDN hostname for
 	Hostname string `json:"hostname"`
 
