@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"github.com/cloudflare/cloudflare-go"
 	argonautv1 "github.com/laetho/argonaut/api/v1beta1"
 	"strings"
@@ -10,25 +9,21 @@ import (
 )
 
 // Reconcile Zones
-func (r *ArgonautReconciler) ReconcileZone(ctx context.Context, cfc *cloudflare.API, argonaut *argonautv1.Argonaut) error {
-	if !r.ZoneExists(ctx, cfc, HostnameToZone(argonaut.Spec.Ingress[0].Hostname)) {
-		return fmt.Errorf("zone does not exist")
+func (r *ArgonautReconciler) ReconcileZone(ctx context.Context, cfc *cloudflare.API, argonaut *argonautv1.Argonaut) (string, error) {
+	zoneid, err := r.ZoneExists(ctx, cfc, HostnameToZone(argonaut.Spec.Ingress[0].Hostname))
+	if err != nil {
+		return "", err
 	}
-	return nil
+	return zoneid, nil
 }
 
 // Check if a DNS Zone exists.
-func (r *ArgonautReconciler) ZoneExists(ctx context.Context, cfc *cloudflare.API, name string) bool {
-
-	zones, err := cfc.ListZones(ctx, name)
+func (r *ArgonautReconciler) ZoneExists(ctx context.Context, cfc *cloudflare.API, name string) (string, error) {
+	zoneid, err := cfc.ZoneIDByName(name)
 	if err != nil {
-		return false
+		return "", err
 	}
-
-	fmt.Println(zones)
-
-	return true
-
+	return zoneid, nil
 }
 
 // Helper function to turn a hostname into a Zone. Example blah.example.com into example.com.

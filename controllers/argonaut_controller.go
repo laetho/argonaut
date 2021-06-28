@@ -66,15 +66,10 @@ func (r *ArgonautReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	// ?. [ ] Support Load Balancers
 	tun, err := r.ReconcileArgoTunnel(ctx, cfc, &argonaut)
 	if err != nil {
-		fmt.Println("failed to reconcile?")
-		return ctrl.Result{Requeue: true, RequeueAfter: 60000000000}, nil
+		return ctrl.Result{Requeue: true, RequeueAfter: 60000000000}, err
 	}
-	fmt.Println(tun)
 
-	if err := r.ReconcileZone(ctx, cfc, &argonaut); err != nil {
-		return ctrl.Result{}, err
-	}
-	fmt.Println("Zone and DNS reconciled...")
+	r.ReconcileDNS(ctx, cfc, &argonaut, tun)
 
 	// Update status on the Argonaut instance.
 	if err := r.Status().Update(ctx, &argonaut); err != nil {
