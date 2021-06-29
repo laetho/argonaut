@@ -69,7 +69,9 @@ func (r *ArgonautReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{Requeue: true, RequeueAfter: 60000000000}, err
 	}
 
-	r.ReconcileDNS(ctx, cfc, &argonaut, tun)
+	if err := r.ReconcileDNS(ctx, cfc, &argonaut, tun); err != nil {
+		return ctrl.Result{}, err
+	}
 
 	// Update status on the Argonaut instance.
 	if err := r.Status().Update(ctx, &argonaut); err != nil {
