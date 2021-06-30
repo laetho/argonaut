@@ -48,7 +48,11 @@ type ArgonautIngressRule struct {
 	Path string `json:"path,omitempty"`
 
 	// Label selector for finding pod's to tunnel traffic for
+	// EndpointsSelector and ServiceSelector are mutually exclusive
 	EndpointsSelector metav1.LabelSelector `json:"endpointsSelector,omitempty"`
+
+	// Service selector for finding a ClusterIP to tunnel traffic to
+	ServiceSelector metav1.LabelSelector `json:"serviceSelector,omitempty"`
 }
 
 // ArgonautStatus defines the observed state of Argonaut

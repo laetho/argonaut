@@ -58,6 +58,7 @@ func (r *ArgonautReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+	log.FromContext(ctx).Info("reconcile of Argonaut instance", "instance", argonaut.Name, "cfaccount", cfc.AccountID)
 
 	// Reconciliation flow for CloudFlare Resources
 	// 1. [ ] Reconcile Argo Tunnel
@@ -66,15 +67,18 @@ func (r *ArgonautReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	// ?. [ ] Support Load Balancers
 	tun, err := r.ReconcileArgoTunnel(ctx, cfc, &argonaut)
 	if err != nil {
+		log.FromContext(ctx).Error(err, "unable to reconcile tunnel, requeuing", tun)
 		return ctrl.Result{Requeue: true, RequeueAfter: 60000000000}, err
 	}
 
 	if err := r.ReconcileDNS(ctx, cfc, &argonaut, tun); err != nil {
+		log.FromContext(ctx).Error(err, "unable to reconcile dns entries")
 		return ctrl.Result{}, err
 	}
 
 	// Update status on the Argonaut instance.
 	if err := r.Status().Update(ctx, &argonaut); err != nil {
+		log.FromContext(ctx).Error(err, "unable to update status on Argonaut", argonaut)
 		return ctrl.Result{}, err
 	}
 	return ctrl.Result{}, nil
@@ -113,16 +117,17 @@ func (r *ArgonautReconciler) CloudflareLogin(ctx context.Context, argonaut *argo
 	return cfc, nil
 }
 
-// Get a a slice of EndpointsList for an Argonaut resource
-func (r *ArgonautReconciler) EndpointsLists(ctx context.Context, argonaut *argonautv1.Argonaut) []v1.EndpointsList {
-	var eps []v1.EndpointsList
+// Get a map with EndpointsList keyed on hostname for an Argonaut resource
+func (r *ArgonautReconciler) EndpointsLists(ctx context.Context, argonaut *argonautv1.Argonaut) map[string]v1.EndpointsList {
+	eps := make(map[string]v1.EndpointsList)
+
 	for _, h := range argonaut.Spec.Ingress {
 		var el v1.EndpointsList
 		err := r.List(ctx, &el, client.MatchingLabels(h.EndpointsSelector.MatchLabels))
 		if errors.IsNotFound(err) {
 			fmt.Println("Did not find EndpointsList with selector:", h.EndpointsSelector.MatchLabels)
 		}
-		eps = append(eps, el)
+		eps[h.Hostname] = el
 	}
 	return eps
 }
