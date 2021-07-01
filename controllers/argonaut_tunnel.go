@@ -34,7 +34,6 @@ func (r *ArgonautReconciler) ReconcileArgoTunnel(ctx context.Context, cfc *cloud
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println(tun)
 	}
 	// Create ConfigMap, will be mapped into Pod
 	if err := r.ReconcileArgonautTunnelSecret(ctx, argonaut, &tun, cfc.AccountID); err != nil {
@@ -58,7 +57,9 @@ func (r *ArgonautReconciler) GetArgoTunnel(ctx context.Context, cfc *cloudflare.
 
 	for _, tun := range tuns {
 		if tun.Name == argonaut.Spec.ArgoTunnelName {
-			return tun, nil
+			tunnel, _ := cfc.ArgoTunnel(ctx, cfc.AccountID, tun.ID)
+			fmt.Println("TUNNEL:", tunnel)
+			return tunnel, nil
 		}
 	}
 
@@ -72,6 +73,7 @@ func (r *ArgonautReconciler) CreateArgoTunnel(ctx context.Context, cfc *cloudfla
 	if err != nil {
 		return cloudflare.ArgoTunnel{}, err
 	}
+	tun.Secret = base64.StdEncoding.EncodeToString([]byte("SuperSecretStringGeneratorHere"))
 	return tun, nil
 }
 
@@ -79,19 +81,20 @@ func (r *ArgonautReconciler) CreateArgoTunnel(ctx context.Context, cfc *cloudfla
 func (r *ArgonautReconciler) ReconcileArgonautTunnelSecret(ctx context.Context, argonaut *argonautv1.Argonaut, tun *cloudflare.ArgoTunnel, account string) error {
 	var secret v1.Secret
 
-	payload, err := json.Marshal(ArgonautTunnelSecret{
-		AccountTag:   account,
-		TunnelSecret: tun.Secret,
-		TunnelID:     tun.ID,
-		TunnelName:   tun.Name,
-	})
-	if err != nil {
-		return err
-	}
-
-	if err := r.Get(ctx, client.ObjectKey{Name: argonaut.Name, Namespace: argonaut.Namespace}, &secret); err != nil {
+	if err := r.Get(ctx, client.ObjectKey{Name: tun.Name, Namespace: argonaut.Namespace}, &secret); err != nil {
 		log.FromContext(ctx).Info("Argonaut tunnel secret not found, creating", "secret", argonaut.Name)
-		secret.Name = argonaut.Name
+
+		payload, err := json.Marshal(ArgonautTunnelSecret{
+			AccountTag:   account,
+			TunnelSecret: tun.Secret,
+			TunnelID:     tun.ID,
+			TunnelName:   tun.Name,
+		})
+		if err != nil {
+			return err
+		}
+
+		secret.Name = tun.Name
 		secret.Namespace = argonaut.Namespace
 		secret.StringData = make(map[string]string)
 		secret.StringData["tunnel.json"] = string(payload)
@@ -100,7 +103,20 @@ func (r *ArgonautReconciler) ReconcileArgonautTunnelSecret(ctx context.Context, 
 			return err
 		}
 	} else {
-		secret.Name = argonaut.Name
+		var ts ArgonautTunnelSecret
+
+		err := json.Unmarshal(secret.Data["tunnel.json"], &ts)
+		if err != nil {
+			log.FromContext(ctx).Error(err, "Unable to unmarshal tunnel.json from ArgonautTunnelSecret", ts)
+			return err
+		}
+
+		payload, err := json.Marshal(ts)
+		if err != nil {
+			return err
+		}
+
+		secret.Name = tun.Name
 		secret.Namespace = argonaut.Namespace
 		secret.StringData = make(map[string]string)
 		secret.StringData["tunnel.json"] = string(payload)
@@ -127,7 +143,7 @@ func (r *ArgonautReconciler) ReconcileArgonautTunnelConfig(ctx context.Context, 
 		conf.Name = argonaut.Name
 		conf.Namespace = argonaut.Namespace
 		conf.Data = make(map[string]string)
-		conf.Data["config.yml"] = string(payload)
+		conf.Data["config.yaml"] = string(payload)
 
 		if err := r.Create(ctx, &conf); err != nil {
 			return err
@@ -136,7 +152,7 @@ func (r *ArgonautReconciler) ReconcileArgonautTunnelConfig(ctx context.Context, 
 		conf.Name = argonaut.Name
 		conf.Namespace = argonaut.Namespace
 		conf.Data = make(map[string]string)
-		conf.Data["config.yml"] = string(payload)
+		conf.Data["config.yaml"] = string(payload)
 
 		if err := r.Update(ctx, &conf); err != nil {
 			return err
@@ -159,7 +175,7 @@ func (r *ArgonautReconciler) DeleteArgoTunnel(ctx context.Context, cfc *cloudfla
 func (r *ArgonautReconciler) BuildArgonautTunnelConfig(ctx context.Context, argonaut *argonautv1.Argonaut, tun *cloudflare.ArgoTunnel) ArgonautTunnelConfig {
 	conf := ArgonautTunnelConfig{
 		Tunnel:          tun.ID,
-		CredentialsFile: "/etc/cloudflared/tunnel.json",
+		CredentialsFile: "/etc/cloudflare/tunnels/tunnel.json",
 		Ingress:         nil,
 	}
 	var ingressConf []ArgonautTunnelConfigIngress

@@ -41,6 +41,7 @@ type ArgonautReconciler struct {
 //+kubebuilder:rbac:groups=core,resources=endpoints,verbs=get;list;watch
 //+kubebuilder:rbac:groups=core,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=secrets,verbs=get;list;watch
+//+kubebuilder:rbac:groups=core,resources=configmaps,verbs=get;list;watch;create;update;patch;delete
 
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
@@ -73,6 +74,11 @@ func (r *ArgonautReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	if err := r.ReconcileDNS(ctx, cfc, &argonaut, tun); err != nil {
 		log.FromContext(ctx).Error(err, "unable to reconcile dns entries")
+		return ctrl.Result{}, err
+	}
+
+	if err := r.ReconcileArgonautDeployment(ctx, &argonaut); err != nil {
+		log.FromContext(ctx).Error(err, "unable to reconcile Deployment", "name", argonaut.Name)
 		return ctrl.Result{}, err
 	}
 

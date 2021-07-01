@@ -4,12 +4,16 @@ metadata:
   name: testantino
   namespace: default
 spec:
-  argoTunnelName: "test"
+  argoTunnelName: "slartibartfast"
   cfAuthSecret:
     name: argonaut
     namespace: default
   ingress:
     - hostname: test.anti.no
-      endpointsSelector:
+      serviceSelector:
+        matchLabels:
+          app: nginx
+    - hostname: test2.anti.no
+      serviceSelector:
         matchLabels:
           app: nginx
