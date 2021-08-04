@@ -7,6 +7,7 @@ import (
 	v12 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"time"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -110,6 +111,7 @@ func (r *ArgonautReconciler) ReconcileArgonautDeployment(ctx context.Context, ar
 		deployment.Name = argonaut.Name
 		deployment.Namespace = argonaut.Namespace
 		deployment.ObjectMeta.Labels = labels
+		deployment.ObjectMeta.Annotations["argonaut.metalabs.no/reconciledAt"] = metav1.NewTime(time.Now()).String()
 		deployment.OwnerReferences = append([]metav1.OwnerReference{}, ownerRef)
 		deployment.Spec.Selector = &labelSelector
 		deployment.Spec.Template.Name = argonaut.Name
