@@ -86,7 +86,7 @@ func (r *ArgonautReconciler) ReconcileArgonautTunnelSecret(ctx context.Context, 
 
 		payload, err := json.Marshal(ArgonautTunnelSecret{
 			AccountTag:   account,
-			TunnelSecret: tun.Secret,
+			TunnelSecret: base64.StdEncoding.EncodeToString([]byte("SuperSecretStringGeneratorHere")),
 			TunnelID:     tun.ID,
 			TunnelName:   tun.Name,
 		})
